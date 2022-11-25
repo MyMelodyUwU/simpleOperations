@@ -3,7 +3,7 @@
 # My aim is to:
 
 # Take 2 forms of input
-# Cut the console input 
+# Cut the console input
 # Operation -> Find a number between the min and max number
 # Append it to console or output
 
@@ -27,21 +27,29 @@ def parse_arguments():
 def read():
     file = open(input_file, "r")
     record = file.read()[:-1]
+    return record
+
+def convert(record):
     values = []
-    for value in record.split():
+    for value in record.split(","):
         values.append(int(value))
-    return values 
+    return values
+
+def write(result):
+    file = open(output_file, "w")
+    for item in result:
+        file.write("%s\n" % item)
 
 def operation_average(values):
     print(f"Average: {values}")
-    sum = 0
+    sum = 0 
     for i in values:
         sum += i
     return [sum/len(values)]
 
 def operation_sum(values):
     print(f"Sum: {values}")
-    sum = 0
+    sum = 0 
     for i in values:
         sum += i
     return [sum]
@@ -53,31 +61,34 @@ def operation_binary(values):
         list_of_binary.append(bin(i)[2:])
     return list_of_binary
 
-def operation_random(output_list_size):
+def operation_random(values):
+    output_list_size = values[0]
     list = []
     for i in range(output_list_size):
         list.append(str(random.randint(0, output_list_size)))
     return list
 
-def write(result):
-    file = open(output_file, "w")
-    for item in result:
-        file.write("%s\n" % item)
+def operation_sum_binary(values):
+    return operation_binary(operation_sum(values))
+# ^ Good design == easy + flexible code to change
+
+operations = {
+    "average": operation_average,
+    "binary": operation_binary,
+    "random": operation_random,
+    "sum": operation_sum,
+    "sum_binary": operation_sum_binary
+}
 
 def main():
     operation = parse_arguments()
-    values = read()
-    result = [f"Invalid operation: {operation}"]
-    if operation == "average":
-        result = operation_average(values)
-    if operation == "sum":
-        result = operation_sum(values)
-    if operation == "binary":
-        result = operation_binary(values)
-    if operation == "random":
-        result = operation_random(values[0])
-    write(result)
-
+    record = read()
+    values = convert(record)
+    if operation in operations:
+        result = operations[operation](values)
+        write(result)
+    else:
+        print(f"Invalid operation: {operation}")
 
 if __name__ == "__main__":
     main()
